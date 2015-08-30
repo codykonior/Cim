@@ -1,11 +1,11 @@
 ﻿#Requires -Version 3.0
-function New-MrCimSession {
+function New-DownCimSession {
 <#
 .SYNOPSIS
     Creates CimSessions to remote computer(s), automatically determining if the WSMAN
     or Dcom protocol should be used.
 .DESCRIPTION
-    New-MrCimSession is a function that is designed to create CimSessions to one or more
+    New-DownCimSession is a function that is designed to create CimSessions to one or more
     computers, automatically determining if the default WSMAN protocol or the backwards
     compatible Dcom protocol should be used. PowerShell version 3 is required on the
     computer that this function is being run on, but PowerShell does not need to be
@@ -17,11 +17,11 @@ function New-MrCimSession {
     Specifies a user account that has permission to perform this action. The default is
     the current user.
 .EXAMPLE
-     New-MrCimSession -ComputerName Server01, Server02
+     New-DownCimSession -ComputerName Server01, Server02
 .EXAMPLE
-     New-MrCimSession -ComputerName Server01, Server02 -Credential (Get-Credential)
+     New-DownCimSession -ComputerName Server01, Server02 -Credential (Get-Credential)
 .EXAMPLE
-     Get-Content -Path C:\Servers.txt | New-MrCimSession
+     Get-Content -Path C:\Servers.txt | New-DownCimSession
 .INPUTS
     String
 .OUTPUTS
