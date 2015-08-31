@@ -62,7 +62,7 @@ function New-DownCimSession {
                     Write-Verbose "Connected to $computer using the WSMAN protocol."
                 }
             } catch {
-                # Swallow theunderlying error because we'll try DCOM next
+                $_ | Write-Debug
             }
 
             try {
@@ -71,7 +71,7 @@ function New-DownCimSession {
                     Write-Verbose "Connected to $computer using the DCOM protocol."
                 } 
             } catch {
-                # Swallow the underlying error because they're verbose and not very useful
+                $_ | Write-Debug
                 Write-Error "Unable to connect to $computer using the WSMAN or DCOM protocol."
             }
         }
