@@ -74,6 +74,8 @@ function New-DownCimSession {
                 $_ | Write-Debug
                 Write-Error "Unable to connect to $computer using the WSMAN or DCOM protocol."
             }
+
+            $cimSession
         }
     }
 
