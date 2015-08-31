@@ -54,12 +54,17 @@ function New-DownCimSession {
 
     Process {
         foreach ($computer in $ComputerName) {
-            $cimSession = $null
-
+            # Heaven help me, sometimes I found multiple connections already
+            if ($cimSession = Get-CimSession -ComputerName $computer -ErrorAction:SilentlyContinue | Select -First 1) {
+                Write-Verbose "Used existing connection to $computer using the $($cimSession.Protocol) protocol."
+            }
+            
             try {
-            	if ((Test-WSMan -ComputerName $computer @sessionSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
-                    $cimSession = New-CimSession -ComputerName $computer @sessionSplat
-                    Write-Verbose "Connected to $computer using the WSMAN protocol."
+                if (!$cimSession) {
+                    if ((Test-WSMan -ComputerName $computer @sessionSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
+                        $cimSession = New-CimSession -ComputerName $computer @sessionSplat
+                        Write-Verbose "Connected to $computer using the WSMAN protocol."
+                    }
                 }
             } catch {
                 $_ | Write-Debug
@@ -75,7 +80,9 @@ function New-DownCimSession {
                 Write-Error "Unable to connect to $computer using the WSMAN or DCOM protocol."
             }
 
-            $cimSession
+            if ($cimSession) {
+                $cimSession
+            }
         }
     }
 
