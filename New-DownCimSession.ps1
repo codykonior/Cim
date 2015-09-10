@@ -33,6 +33,7 @@ Originally written by Mike F Robbins @ http://mikefrobbins.com
 
 Verbose is false on the New-CimSession call because it always returns a useless "Write-Verbose "''"
 #>
+
 function New-DownCimSession {
     [CmdletBinding()]
     param(
