@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-Creates CimSessions to remote computer(s), automatically determining if the WSMAN or Dcom protocol should be used.
+Creates CimSessions to remote computer(s), automatically determining if the WSMAN or DCOM protocol should be used.
 
 .DESCRIPTION
-New-DownCimSession is a function that is designed to create CimSessions to one or more computers, automatically determining if the default WSMAN protocol or the backwards compatible Dcom protocol should be used. PowerShell version 3 is required on the computer that this function is being run on, but PowerShell does not need to be installed at all on the remote computer.
+New-CimSessionDown is a function that is designed to create CimSessions to one or more computers, automatically determining if the default WSMAN protocol or the backwards compatible DCOM protocol should be used. PowerShell version 3 is required on the computer that this function is being run on, but PowerShell does not need to be installed at all on the remote computer.
 
 The "Down" stands for automatically supporting down-level versions of CIM using DCOM.
 
@@ -14,13 +14,13 @@ The name of the remote computer(s). This parameter accepts pipeline input. The l
 Specifies a user account that has permission to perform this action. The default is the current user.
 
 .EXAMPLE
-New-DownCimSession -ComputerName Server01, Server02
+New-CimSessionDown -ComputerName Server01, Server02
 
 .EXAMPLE
-New-DownCimSession -ComputerName Server01, Server02 -Credential (Get-Credential)
+New-CimSessionDown -ComputerName Server01, Server02 -Credential (Get-Credential)
 
 .EXAMPLE
-Get-Content -Path C:\Servers.txt | New-DownCimSession
+Get-Content -Path C:\Servers.txt | New-CimSessionDown 
 
 .INPUTS
 String
@@ -31,10 +31,10 @@ Microsoft.Management.Infrastructure.CimSession
 .NOTES
 Originally written by Mike F Robbins @ http://mikefrobbins.com
 
-Verbose is false on the New-CimSession call because it always returns a useless "Write-Verbose "''"
+Verbose is always explicitly disabled on the New-CimSession call because it always returns a useless "Write-Verbose "''"
 #>
 
-function New-DownCimSession {
+function New-CimSessionDown {
     [CmdletBinding()]
     param(
         [Parameter(ValueFromPipeline)]
