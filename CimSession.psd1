@@ -21,7 +21,7 @@ GUID = 'cb3e47eb-f253-4278-a2d7-b5cff73a85a7'
 Author = 'Cody Konior'
 
 # Company or vendor of this module
-CompanyName = 'Safe SQL'
+CompanyName = 'Cody Konior'
 
 # Copyright statement for this module
 Copyright = '(c) 2015 Cody Konior. All rights reserved.'

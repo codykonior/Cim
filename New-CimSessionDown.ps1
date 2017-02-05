@@ -40,14 +40,18 @@ function New-CimSessionDown {
         [Parameter(ValueFromPipeline)]
         [ValidateNotNullorEmpty()]
         [string[]] $ComputerName = $env:COMPUTERNAME,
+        [PSCredential] $Credential,
  
-        [PSCredential] $Credential
+        $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 
     Begin {
         $sessionOption = New-CimSessionOption -Protocol Dcom
 
-        $sessionSplat = @{ Verbose = $false }
+        $sessionSplat = @{ 
+		Verbose = $false 
+		OperationTimeoutSec = $OperationTimeoutSec
+	}
         if ($Credential) {
             $sessionSplat.Credential = $Credential
         }
