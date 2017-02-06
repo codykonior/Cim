@@ -1,14 +1,21 @@
 ﻿<#
 .SYNOPSIS
-Creates CimSessions to remote computer(s), automatically determining if the WSMAN or DCOM protocol should be used.
+Opens a CIM session to a computer, with a fallback from WSMAN to DCOM for older operating systems.
 
 .DESCRIPTION
-New-CimSessionDown is a function that is designed to create CimSessions to one or more computers, automatically determining if the default WSMAN protocol or the backwards compatible DCOM protocol should be used. PowerShell version 3 is required on the computer that this function is being run on, but PowerShell does not need to be installed at all on the remote computer.
+CIM is the preferred method of interacting with WMI on a computer. It can reuse a single session 
+instead of creaing a new session for each interaction. It can timeout which the built-in WMI 
+functions will not. When communicating with modern operating systems it is less chatty with a
+fraction of the number of network roundtrips.
 
-The "Down" stands for automatically supporting down-level versions of CIM using DCOM.
+A New-CimSession by default only attempts a WSMAN connection, which is the modern CIM protocol.
+However New-CimSessionDown also adds in an additional check for DCOM if WSMAN fails. This allows
+you to use CIM to communicate with all of your Windows estate without building two sets of CIM
+and WMI calls.
 
 .PARAMETER ComputerName
-The name of the remote computer(s). This parameter accepts pipeline input. The local computer is the default.
+The name of the remote computer(s). This parameter accepts pipeline input. The local computer 
+is the default.
 
 .PARAMETER Credential
 Specifies a user account that has permission to perform this action. The default is the current user.
@@ -29,29 +36,31 @@ String
 Microsoft.Management.Infrastructure.CimSession
 
 .NOTES
-Originally written by Mike F Robbins @ http://mikefrobbins.com
+This function requires PowerShell v3 but PowerShell does not need to be installed on the remote computer. The "down" in New-CimSessionDown stands for "down-level", because it talks to down-level versions of Windows. Verbose is always explicitly disabled on the New-CimSession call because it returns a useless message of ''.
 
-Verbose is always explicitly disabled on the New-CimSession call because it always returns a useless "Write-Verbose "''"
+This function is based largely on work done by Mike F Robbins @ http://mikefrobbins.com
+
 #>
 
 function New-CimSessionDown {
     [CmdletBinding()]
     param(
         [Parameter(ValueFromPipeline)]
+        [Alias("Name")]
         [ValidateNotNullorEmpty()]
         [string[]] $ComputerName = $env:COMPUTERNAME,
         [PSCredential] $Credential,
- 
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 
-    Begin {
+    begin {
         $sessionOption = New-CimSessionOption -Protocol Dcom
 
         $sessionSplat = @{ 
-		Verbose = $false 
-		OperationTimeoutSec = $OperationTimeoutSec
-	}
+		    Verbose = $false 
+		    OperationTimeoutSec = $OperationTimeoutSec
+	    }
+        
         if ($Credential) {
             $sessionSplat.Credential = $Credential
         }
@@ -72,7 +81,7 @@ function New-CimSessionDown {
                     }
                 }
             } catch {
-                $_ | Write-Debug
+                Write-Verbose "Faied to connect to $computer with WSMAN protocol: $_"
             }
 
             try {
@@ -81,8 +90,7 @@ function New-CimSessionDown {
                     Write-Verbose "Connected to $computer using the DCOM protocol."
                 } 
             } catch {
-                $_ | Write-Debug
-                Write-Error "Unable to connect to $computer using the WSMAN or DCOM protocol."
+                Write-Error "Faied to connect to $computer with DCOM protocol: $_"
             }
 
             if ($cimSession) {
@@ -91,6 +99,6 @@ function New-CimSessionDown {
         }
     }
 
-    End {
+    end {
     }
 }
