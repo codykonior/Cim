@@ -9,10 +9,10 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-ModuleToProcess = 'CimSession.psm1'
+RootModule = 'CimSession.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '1.01'
 
 # ID used to uniquely identify this module
 GUID = 'cb3e47eb-f253-4278-a2d7-b5cff73a85a7'
@@ -21,13 +21,13 @@ GUID = 'cb3e47eb-f253-4278-a2d7-b5cff73a85a7'
 Author = 'Cody Konior'
 
 # Company or vendor of this module
-CompanyName = 'Cody Konior'
+CompanyName = ''
 
 # Copyright statement for this module
 Copyright = '(c) 2015 Cody Konior. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'New-CimSession with support for lower operating systems'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''

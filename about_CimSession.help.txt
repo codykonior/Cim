@@ -1,13 +1,11 @@
-# PowerShell: CimSession module
-
-## TOPIC
+﻿TOPIC
     about_CimSession
 
-## SHORT DESCRIPTION
+SHORT DESCRIPTION
 	Opens a CIM session to a computer, with a fallback from WSMAN to DCOM for older 
 	operating systems.
 
-## LONG DESCRIPTION
+LONG DESCRIPTION
 	CIM is the preferred method of interacting with WMI on a computer. It can reuse a 
 	single session instead of creaing a new session for each interaction. It can timeout 
 	which the built-in WMI functions will not. When communicating with modern operating 
@@ -22,14 +20,13 @@
 	You should always specify -OperationTimeoutSec on any Get-CimInstance and related 
 	calls over a CimSession.
 
-## REQUIREMENTS
+REQUIREMENTS
 	PowerShell v3 only the computer using the function, not on the host.
 	
-## EXAMPLE #1
+EXAMPLE #1
 	$cimSession = New-CimSessionDown Server1
 	Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
 
-## LINKS
+LINKS
 	https://github.com/codykonior/CimSession
-
 

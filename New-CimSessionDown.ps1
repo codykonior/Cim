@@ -3,31 +3,25 @@
 Opens a CIM session to a computer, with a fallback from WSMAN to DCOM for older operating systems.
 
 .DESCRIPTION
-CIM is the preferred method of interacting with WMI on a computer. It can reuse a single session 
-instead of creaing a new session for each interaction. It can timeout which the built-in WMI 
-functions will not. When communicating with modern operating systems it is less chatty with a
-fraction of the number of network roundtrips.
+CIM is the preferred method of interacting with WMI on a computer. It can reuse a single session instead of creaing a new session for each interaction. It can timeout which the built-in WMI functions will not. When communicating with modern operating systems it is less chatty with a fraction of the number of network roundtrips.
 
-A New-CimSession by default only attempts a WSMAN connection, which is the modern CIM protocol.
-However New-CimSessionDown also adds in an additional check for DCOM if WSMAN fails. This allows
-you to use CIM to communicate with all of your Windows estate without building two sets of CIM
-and WMI calls.
+A New-CimSession by default only attempts a WSMAN connection, which is the modern CIM protocol. By using New-CimSessionDown instead existing connections can be re-used, and an additional check is done to use DCOM if WSMAN fails. This allows you to use CIM to communicate with all of your Windows estate without building two sets of CIM and WMI calls.
+
+You should always specify -OperationTimeoutSec on any Get-CimInstance and related calls over a CimSession.
 
 .PARAMETER ComputerName
-The name of the remote computer(s). This parameter accepts pipeline input. The local computer 
-is the default.
+The name of the remote computer(s). This parameter accepts pipeline input. The local computer is the default.
 
 .PARAMETER Credential
 Specifies a user account that has permission to perform this action. The default is the current user.
 
-.EXAMPLE
-New-CimSessionDown -ComputerName Server01, Server02
+It's not possible to tell connections apart by credential, so, multiple connections to one server with different users is not recommended, as the wrong session may be returned.
 
 .EXAMPLE
-New-CimSessionDown -ComputerName Server01, Server02 -Credential (Get-Credential)
+New-CimSessionDown -ComputerName Server1
+New-CimSessionDown -ComputerName Server1, Server2
 
-.EXAMPLE
-Get-Content -Path C:\Servers.txt | New-CimSessionDown 
+Creates a session to a server, then re-retrieves that existing session, along with a new one.
 
 .INPUTS
 String
@@ -36,7 +30,9 @@ String
 Microsoft.Management.Infrastructure.CimSession
 
 .NOTES
-This function requires PowerShell v3 but PowerShell does not need to be installed on the remote computer. The "down" in New-CimSessionDown stands for "down-level", because it talks to down-level versions of Windows. Verbose is always explicitly disabled on the New-CimSession call because it returns a useless message of ''.
+The "Down" in New-CimSessionDown stands for "down-level", because it talks to down-level versions of Windows. 
+
+Verbose is always explicitly disabled on the New-CimSession call because it returns a useless message of ''.
 
 This function is based largely on work done by Mike F Robbins @ http://mikefrobbins.com
 
@@ -90,7 +86,7 @@ function New-CimSessionDown {
                     Write-Verbose "Connected to $computer using the DCOM protocol."
                 } 
             } catch {
-                Write-Error "Faied to connect to $computer with DCOM protocol: $_"
+                Write-Error "Failed to connect to $computer with DCOM protocol: $_"
             }
 
             if ($cimSession) {
