@@ -14,6 +14,9 @@ RootModule = 'CimSession.psm1'
 # Version number of this module.
 ModuleVersion = '1.1.0.1'
 
+# Supported PSEditions
+# CompatiblePSEditions = @()
+
 # ID used to uniquely identify this module
 GUID = 'cb3e47eb-f253-4278-a2d7-b5cff73a85a7'
 
