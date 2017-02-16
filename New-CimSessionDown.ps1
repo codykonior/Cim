@@ -48,16 +48,20 @@ function New-CimSessionDown {
         [PSCredential] $Credential,
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
+	
+	begin {
+        $dcomSessionOption = New-CimSessionOption -Protocol Dcom
 
-    begin {
-        $sessionOption = New-CimSessionOption -Protocol Dcom
-
-        $sessionSplat = @{ 
-		    Verbose = $false 
-		    OperationTimeoutSec = $OperationTimeoutSec
+        $verboseSplat = @{ 
+		    Verbose = $false
 	    }
-        
-        if ($Credential) {
+		
+		$sessionSplat = @{
+			Verbose = $false
+			OperationTimeoutSec = $OperationTimeoutSec
+		}
+		
+		if ($Credential) {
             $sessionSplat.Credential = $Credential
         }
     }
@@ -71,7 +75,7 @@ function New-CimSessionDown {
             
             try {
                 if (!$cimSession) {
-                    if ((Test-WSMan -ComputerName $computer @sessionSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
+                    if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
                         $cimSession = New-CimSession -ComputerName $computer @sessionSplat
                         Write-Verbose "Connected to $computer using the WSMAN protocol."
                     }
@@ -82,7 +86,7 @@ function New-CimSessionDown {
 
             try {
                 if (!$cimSession) {
-                    New-CimSession -ComputerName $computer @sessionSplat -SessionOption $sessionOption
+                    New-CimSession -ComputerName $computer @sessionSplat -SessionOption $dcomSessionOption
                     Write-Verbose "Connected to $computer using the DCOM protocol."
                 } 
             } catch {
