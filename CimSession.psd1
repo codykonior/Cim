@@ -12,7 +12,7 @@
 RootModule = 'CimSession.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.01'
+ModuleVersion = '1.1.0.1'
 
 # ID used to uniquely identify this module
 GUID = 'cb3e47eb-f253-4278-a2d7-b5cff73a85a7'
@@ -30,7 +30,7 @@ Copyright = '(c) 2015 Cody Konior. All rights reserved.'
 Description = 'New-CimSession with support for lower operating systems'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '3.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -66,16 +66,21 @@ Description = 'New-CimSession with support for lower operating systems'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = @(
+    'New-CimSessionDown'
+    )
 
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = @()
 
 # Variables to export from this module
 VariablesToExport = '*'
 
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = @()
+
+# DSC resources to export from this module
+# DscResourcesToExport = @()
 
 # List of all modules packaged with this module
 # ModuleList = @()
@@ -83,8 +88,29 @@ AliasesToExport = '*'
 # List of all files packaged with this module
 # FileList = @()
 
-# Private data to pass to the module specified in RootModule/ModuleToProcess
-# PrivateData = ''
+# Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
+PrivateData = @{
+
+    PSData = @{
+
+        # Tags applied to this module. These help with module discovery in online galleries.
+        # Tags = @()
+
+        # A URL to the license for this module.
+        # LicenseUri = ''
+
+        # A URL to the main website for this project.
+        # ProjectUri = ''
+
+        # A URL to an icon representing this module.
+        # IconUri = ''
+
+        # ReleaseNotes of this module
+        # ReleaseNotes = ''
+
+    } # End of PSData hashtable
+
+} # End of PrivateData hashtable
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''
