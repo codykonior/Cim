@@ -69,7 +69,7 @@ function New-CimSessionDown {
     Process {
         foreach ($computer in $ComputerName) {
             # Heaven help me, sometimes I found multiple connections already
-            if ($cimSession = Get-CimSession -ComputerName $computer -ErrorAction:SilentlyContinue | Select-Object -First 1) {
+            if ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1) {
                 Write-Verbose "Used existing connection to $computer using the $($cimSession.Protocol) protocol."
             }
             
