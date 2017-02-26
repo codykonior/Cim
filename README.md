@@ -45,6 +45,9 @@
 	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.
 
+    Also, WSMAN has some limits for the maximum amount of content that can be
+    sent per request. It's possible to hit this on very large registry queries.
+
 ## REQUIREMENTS
 	PowerShell v3 only the computer using the function, not on the host.
 	
@@ -54,12 +57,7 @@
 
 ## EXAMPLE #2
     Get-CimKey C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-
-	$cimSession = New-CimSessionDown C1N1
-	Get-CimEnumKey $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-	Get-CimEnumValues $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-    Get-CimStringValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "RepairCategory"
-    Get-CimDWORDValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "EnableLog"
+    Get-CimValue C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 
 ## LINKS
 	https://github.com/codykonior/CimSession
