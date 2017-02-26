@@ -12,7 +12,7 @@
 RootModule = 'CimSession.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.1.0.2'
+ModuleVersion = '1.2.0.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -70,7 +70,18 @@ PowerShellVersion = '3.0'
 
 # Functions to export from this module
 FunctionsToExport = @(
-    'New-CimSessionDown'
+    'New-CimSessionDown',
+    'Get-CimKey',
+    'Get-CimValue',
+
+    'Get-CimEnumKey',
+    'Get-CimEnumValues',
+    'Get-CimBinaryValue',
+    'Get-CimDWORDValue',
+    'Get-CimExpandedStringValue',
+    'Get-CimMultiStringValue',
+    'Get-CimQWORDValue',
+    'Get-CimStringValue'
     )
 
 # Cmdlets to export from this module

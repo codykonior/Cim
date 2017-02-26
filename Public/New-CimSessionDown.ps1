@@ -41,7 +41,7 @@ This function is based largely on work done by Mike F Robbins @ http://mikefrobb
 function New-CimSessionDown {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline)]
+        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
         [Alias("Name")]
         [ValidateNotNullorEmpty()]
         [string[]] $ComputerName = $env:COMPUTERNAME,
@@ -71,30 +71,25 @@ function New-CimSessionDown {
             # Heaven help me, sometimes I found multiple connections already
             if ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1) {
                 Write-Verbose "Used existing connection to $computer using the $($cimSession.Protocol) protocol."
-            }
-            
-            try {
-                if (!$cimSession) {
+                $cimSession
+            } else {
+                try {
                     if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
                         $cimSession = New-CimSession -ComputerName $computer @sessionSplat
                         Write-Verbose "Connected to $computer using the WSMAN protocol."
+                        $cimSession
+                    }
+                } catch {
+                    Write-Verbose "Faied to connect to $computer with WSMAN protocol: $_"
+
+                    try {
+                        New-CimSession -ComputerName $computer @sessionSplat -SessionOption $dcomSessionOption
+                        Write-Verbose "Connected to $computer using the DCOM protocol."
+                        $cimSession
+                    } catch {
+                        Write-Error "Failed to connect to $computer with DCOM protocol: $_"
                     }
                 }
-            } catch {
-                Write-Verbose "Faied to connect to $computer with WSMAN protocol: $_"
-            }
-
-            try {
-                if (!$cimSession) {
-                    New-CimSession -ComputerName $computer @sessionSplat -SessionOption $dcomSessionOption
-                    Write-Verbose "Connected to $computer using the DCOM protocol."
-                } 
-            } catch {
-                Write-Error "Failed to connect to $computer with DCOM protocol: $_"
-            }
-
-            if ($cimSession) {
-                $cimSession
             }
         }
     }
