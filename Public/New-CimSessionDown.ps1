@@ -81,7 +81,9 @@ function New-CimSessionDown {
                     }
                 } catch {
                     Write-Verbose "Faied to connect to $computer with WSMAN protocol: $_"
+                }
 
+                if (!$cimSession) {
                     try {
                         New-CimSession -ComputerName $computer @sessionSplat -SessionOption $dcomSessionOption
                         Write-Verbose "Connected to $computer using the DCOM protocol."
