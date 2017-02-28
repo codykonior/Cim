@@ -14,8 +14,11 @@ A CimSession from New-CimSessionDown.
 .PARAMETER Hive
 A hive type. The default is LocalMachine.
 
+.PARAMETER Key
+The name of the key to read.
+
 .PARAMETER Value
-The name of the value to read.
+A filter to apply to the last value.
 
 .PARAMETER Simple
 Whether to return the full output or only the data.
@@ -30,20 +33,17 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 function Get-CimRegKey {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=1)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=1)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=3)]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=3)]
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=2)]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=2)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [string] $Key,
+        [string[]] $Value,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 	
@@ -51,17 +51,15 @@ function Get-CimRegKey {
     }
 
     process {
-        if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $cimKeys = Get-CimRegEnumKey -ComputerName $ComputerName -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
-        } else {
-            $cimKeys = Get-CimRegEnumKey -CimSession $CimSession -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec        
-        }
+        $cimKeys = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegEnumKey -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
 
         foreach ($cimName in $cimKeys.sNames) {
-            [PSCustomObject] @{
-                ComputerName = $cimKeys.PSComputerName
-                Hive = $Hive
-                Key = "$Key\$cimName"
+            if (!$Value -or $Value -contains $cimName) {
+                [PSCustomObject] @{
+                    ComputerName = $cimKeys.PSComputerName
+                    Hive = $Hive
+                    Key = "$Key\$cimName"
+                }
             }
         }
     }

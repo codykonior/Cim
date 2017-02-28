@@ -31,22 +31,16 @@ function Get-CimRegEnumKey {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [string] $ComputerName = $env:COMPUTERNAME,
+        [string] $ComputerName,
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [string] $Key,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [switch] $Simple,
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 	
@@ -57,7 +51,6 @@ function Get-CimRegEnumKey {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
             $CimSession = New-CimSessionDown $ComputerName        
         }
-
         if ($CimSession.Protocol -eq "WSMAN") {
             $namespace = "root\cimv2"
         } else {
@@ -76,6 +69,7 @@ function Get-CimRegEnumKey {
             }
 
         }
+
         $cimResult = Invoke-CimMethod @cimSplat
         if (!$Simple) {
             $cimResult

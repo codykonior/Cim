@@ -20,7 +20,8 @@ LONG DESCRIPTION
     connection. This provides for output literally 2x-4x faster than other 
     methods which really adds up at scale.
 
-    Functions are split between three types:
+    Functions are split between these types:
+
     * Common functions you should use
         New-CimSessionDown
         Get-CimRegKey
@@ -36,9 +37,6 @@ LONG DESCRIPTION
         Get-CimRegMultiStringValue   
         Get-CimRegQWORDValue         
         Get-CimRegStringValue   
-
-    * Internal functions you can't use
-        Invoke-CimGetValue
 
 	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.

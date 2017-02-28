@@ -22,7 +22,8 @@
     connection. This provides for output literally 2x-4x faster than other 
     methods which really adds up at scale.
 
-    Functions are split between three types:
+    Functions are split between these types:
+
     * Common functions you should use
         New-CimSessionDown
         Get-CimRegKey
@@ -39,9 +40,6 @@
         Get-CimRegQWORDValue         
         Get-CimRegStringValue   
 
-    * Internal functions you can't use
-        Invoke-CimRegGetValue
-
 	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.
 
@@ -56,8 +54,15 @@
 	Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
 
 ## EXAMPLE #2
-    Get-CimKey C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-    Get-CimValue C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+    Get the basic SQL Server keys.
+
+    Get-CimRegKey -ComputerName C1N1 -Key "SOFTWARE\Microsoft\Microsoft SQL Server"
+    
+## EXAMPLE 3
+    Get all values inside the UpgradeIncompleteState and ConfigurationState keys, which
+    are under the keys under the Microsoft SQL Server key.
+        
+    Get-CimRegKey -ComputerName C1N1 -Key "SOFTWARE\Microsoft\Microsoft SQL Server" | Get-CimRegKey -Value @("UpgradeIncompleteState", "ConfigurationState") | Get-CimRegValue | Format-Table
 
 ## LINKS
 	https://github.com/codykonior/Cim

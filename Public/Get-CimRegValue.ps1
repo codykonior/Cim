@@ -17,6 +17,9 @@ A hive type. The default is LocalMachine.
 .PARAMETER Key
 The name of the key to read.
 
+.PARAMETER Value
+A filter to apply to the last value.
+
 .PARAMETER Simple
 Whether to return the full output or only the data.
 
@@ -30,20 +33,17 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 function Get-CimRegValue {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=1)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=1)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=3)]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=3)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=2)]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession", Position=2)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [string] $Key,
+        [string[]] $Value,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 	
@@ -51,29 +51,53 @@ function Get-CimRegValue {
     }
 
     process {
-        if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $cimValues = Get-CimRegEnumValues -ComputerName $ComputerName -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
-        } else {
-            $cimValues = Get-CimRegEnumValues -CimSession $CimSession -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec        
-        }
+        $cimValues = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegEnumValues -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
 
         for ($i = 0; $cimValues.sNames -and $i -lt $cimValues.sNames.Count; $i++) {
-            $dataValue = $cimValues.sNames[$i]
-            $dataType = [Microsoft.Win32.RegistryValueKind] $cimValues.Types[$i]
-            if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-                $dataData = &Get-CimReg$($dataType)Value -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $dataValue -OperationTimeoutSec $OperationTimeoutSec -Simple
-            } else {
-                $dataData = &Get-CimReg$($dataType)Value -CimSession $CimSession -Hive $Hive -Key $Key -Value $dataValue -OperationTimeoutSec $OperationTimeoutSec -Simple
-            }
+            $cimValue = $cimValues.sNames[$i]
+            if (!$Value -or $Value -contains $cimValue) {
+                switch ($cimType = [Microsoft.Win32.RegistryValueKind] $cimValues.Types[$i]) {
+                    "String" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegStringValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    "ExpandString" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegExpandedStringValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    "Binary" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegBinaryValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    "DWord" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegDWordValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    "MultiString" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegMultiStringValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    "QWord" {
+                        $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegQWordValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec
+                        break
+                    }
+                    default {
+                        # Unknown
+                        # None
+                        $cimData = $null
+                        break
+                    }
+                }
 
-            [PSCustomObject] @{
-                ComputerName = $cimValues.PSComputerName
-                Hive = $Hive
-                Key = $Key
-                Value = $dataValue
-                Data = $dataData
-                Type = $dataType
-             }
+                [PSCustomObject] @{
+                    ComputerName = $cimValues.PSComputerName
+                    Hive = $Hive
+                    Key = $Key
+                    Value = $cimValue
+                    Data = $cimData
+                    Type = $cimType
+                 }
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-Execute a CIM method to get a QWORD value from the registry.
+Execute a CIM method to get a multi-string value from the registry.
 
 .DESCRIPTION
 Uses CIM to get a registry value for a subkey and name.
@@ -30,7 +30,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimRegQWORDValue {
+function Get-CimRegMultiStringValue {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -38,21 +38,13 @@ function Get-CimRegQWORDValue {
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [string] $Key,
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [string] $Value,
 
-        [Parameter(ParameterSetName="ComputerName")]
-        [Parameter(ParameterSetName="CimSession")]
         [switch] $Simple,
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 	
@@ -61,9 +53,37 @@ function Get-CimRegQWORDValue {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            Invoke-CimRegGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            $CimSession = New-CimSessionDown $ComputerName        
+        }
+        if ($CimSession.Protocol -eq "WSMAN") {
+            $namespace = "root\cimv2"
         } else {
-            Invoke-CimRegGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            $namespace = "root\default"
+        }
+
+        $cimSplat = @{
+            OperationTimeoutSec = $OperationTimeoutSec
+            CimSession = $CimSession
+            Namespace = $namespace
+            ClassName = "StdRegProv"
+            MethodName = $PSCmdlet.MyInvocation.MyCommand.Name.Replace("-CimReg", "")
+            Arguments = @{
+                hDefKey = [uint32] ("0x{0:x}" -f $Hive)
+                sSubKeyName = $Key
+                sValueName = $Value
+            }
+
+        }
+
+        $cimResult = Invoke-CimMethod @cimSplat
+        if (!$Simple) {
+            $cimResult
+        } else {
+            if ($cimResult.psobject.Properties["sValue"]) {
+                $cimResult.sValue
+            } else {
+                $cimResult.uValue
+            }
         }
     }
 
