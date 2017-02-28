@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-Execute a CIM method to get a QWORD value from the registry.
+Execute a CIM method to enumerate a list of values from the registry.
 
 .DESCRIPTION
-Uses CIM to get a registry value for a subkey and name.
+Uses CIM to enumerate values under a subkey.
 
 .PARAMETER ComputerName
 A computer name. A New-CimSessionDown will be created for it.
@@ -17,9 +17,6 @@ A hive type. The default is LocalMachine.
 .PARAMETER Key
 The name of the key to read.
 
-.PARAMETER Value
-The name of the value to read.
-
 .PARAMETER Simple
 Whether to return the full output or only the data.
 
@@ -30,7 +27,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimQWORDValue {
+function Get-CimRegEnumValues {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -44,12 +41,9 @@ function Get-CimQWORDValue {
         [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [string] $Key,
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
-        [string] $Value,
 
-        [Parameter(ParameterSetName="ComputerName")]
-        [Parameter(ParameterSetName="CimSession")]
+        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [switch] $Simple,
         [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
@@ -61,9 +55,32 @@ function Get-CimQWORDValue {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            Invoke-CimGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            $CimSession = New-CimSessionDown $ComputerName        
+        }
+
+        if ($cimSession.Protocol -eq "WSMAN") {
+            $namespace = "root\cimv2"
         } else {
-            Invoke-CimGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            $namespace = "root\default"
+        }
+
+        $cimSplat = @{
+            OperationTimeoutSec = $OperationTimeoutSec
+            CimSession = $CimSession
+            Namespace = $namespace
+            ClassName = "StdRegProv"
+            MethodName = "EnumValues"
+            Arguments = @{
+                hDefKey = [uint32] ("0x{0:x}" -f $Hive)
+                sSubKeyName = $Key
+            }
+
+        }
+        $cimResult = Invoke-CimMethod @cimSplat
+        if (!$Simple) {
+            $cimResult
+        } else {
+            $cimResult.sNames
         }
     }
 

@@ -1,5 +1,5 @@
 ﻿TOPIC
-    about_CimSession
+    about_Cim
 
 SHORT DESCRIPTION
     Allows CIM sessions to be opened to Windows Server 2003 and above with 
@@ -23,19 +23,19 @@ LONG DESCRIPTION
     Functions are split between three types:
     * Common functions you should use
         New-CimSessionDown
-        Get-CimKey
-        Get-CimValues
+        Get-CimRegKey
+        Get-CimRegValues
 
     * Less common functions you should only use if required
-        Get-CimEnumKey            
-        Get-CimEnumValues         
+        Get-CimRegEnumKey            
+        Get-CimRegEnumValues         
 
-        Get-CimBinaryValue        
-        Get-CimDWORDValue         
-        Get-CimExpandedStringValue
-        Get-CimMultiStringValue   
-        Get-CimQWORDValue         
-        Get-CimStringValue   
+        Get-CimRegBinaryValue        
+        Get-CimRegDWORDValue         
+        Get-CimRegExpandedStringValue
+        Get-CimRegMultiStringValue   
+        Get-CimRegQWORDValue         
+        Get-CimRegStringValue   
 
     * Internal functions you can't use
         Invoke-CimGetValue
@@ -51,14 +51,14 @@ EXAMPLE #1
 	Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
 
 EXAMPLE #2
-    Get-CimKey C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+    Get-CimRegKey C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 
 	$cimSession = New-CimSessionDown C1N1
-	Get-CimEnumKey $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-	Get-CimEnumValues $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-    Get-CimStringValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "RepairCategory"
-    Get-CimDWORDValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "EnableLog"
+	Get-CimRegEnumKey $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+	Get-CimRegEnumValues $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+    Get-CimRegStringValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "RepairCategory"
+    Get-CimRegDWORDValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "EnableLog"
 
 LINKS
-	https://github.com/codykonior/CimSession
+	https://github.com/codykonior/Cim
 

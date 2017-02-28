@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-Execute a CIM method to enumerate a list of values from the registry.
+Execute a CIM method to enumerate a list of keys from the registry.
 
 .DESCRIPTION
-Uses CIM to enumerate values under a key.
+Uses CIM to enumerate keys under a key.
 
 .PARAMETER ComputerName
 A computer name. A New-CimSessionDown will be created for it.
@@ -14,8 +14,8 @@ A CimSession from New-CimSessionDown.
 .PARAMETER Hive
 A hive type. The default is LocalMachine.
 
-.PARAMETER Key
-The name of the key to read.
+.PARAMETER Value
+The name of the value to read.
 
 .PARAMETER Simple
 Whether to return the full output or only the data.
@@ -27,7 +27,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimValue {
+function Get-CimRegKey {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName", Position=1)]
@@ -52,28 +52,17 @@ function Get-CimValue {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $cimValues = Get-CimEnumValues -ComputerName $ComputerName -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
+            $cimKeys = Get-CimRegEnumKey -ComputerName $ComputerName -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
         } else {
-            $cimValues = Get-CimEnumValues -CimSession $CimSession -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec        
+            $cimKeys = Get-CimRegEnumKey -CimSession $CimSession -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec        
         }
 
-        for ($i = 0; $cimValues.sNames -and $i -lt $cimValues.sNames.Count; $i++) {
-            $dataValue = $cimValues.sNames[$i]
-            $dataType = [Microsoft.Win32.RegistryValueKind] $cimValues.Types[$i]
-            if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-                $dataData = &Get-Cim$($dataType)Value -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $dataValue -OperationTimeoutSec $OperationTimeoutSec -Simple
-            } else {
-                $dataData = &Get-Cim$($dataType)Value -CimSession $CimSession -Hive $Hive -Key $Key -Value $dataValue -OperationTimeoutSec $OperationTimeoutSec -Simple
-            }
-
+        foreach ($cimName in $cimKeys.sNames) {
             [PSCustomObject] @{
-                ComputerName = $cimValues.PSComputerName
+                ComputerName = $cimKeys.PSComputerName
                 Hive = $Hive
-                Key = $Key
-                Value = $dataValue
-                Data = $dataData
-                Type = $dataType
-             }
+                Key = "$Key\$cimName"
+            }
         }
     }
 

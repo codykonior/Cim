@@ -1,33 +1,34 @@
 ﻿<#
 .SYNOPSIS
-Execute a CIM method to enumerate a list of values from the registry.
+Private function to execute a remote CIM method to get a value type.
 
 .DESCRIPTION
-Uses CIM to enumerate values under a subkey.
-
-.PARAMETER ComputerName
-A computer name. A New-CimSessionDown will be created for it.
+All of the GetXXXValue methods are the same so this is a shortcut to save code. It does a string substitution on the caller name to 
 
 .PARAMETER CimSession
 A CimSession from New-CimSessionDown.
 
-.PARAMETER Hive
-A hive type. The default is LocalMachine.
-
-.PARAMETER Key
+.PARAMETER SubKeyName
 The name of the key to read.
 
-.PARAMETER Simple
-Whether to return the full output or only the data.
+.PARAMETER ValueName
+The name of the value to read.
+
+.PARAMETER Hive
+Which hive, HLKM (the default) or HKCU.
+
+.PARAMETER Raw
+Whether to return the raw output or just the value(s).
 
 .PARAMETER OperationTimeoutSec
 Defaults to 30. If this wasn't specified operations may never timeout.
 
 .NOTES
+Not meant to be called externally.
 
 #>
 
-function Get-CimEnumValues {
+function Invoke-CimRegGetValue {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -42,8 +43,12 @@ function Get-CimEnumValues {
         [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [string] $Key,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [string] $Value,
+
+        [Parameter(ParameterSetName="ComputerName")]
+        [Parameter(ParameterSetName="CimSession")]
         [switch] $Simple,
         [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [Parameter(ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
@@ -64,23 +69,31 @@ function Get-CimEnumValues {
             $namespace = "root\default"
         }
 
+        $methodName = (Get-PSCallStack)[1].Command.Replace("-CimReg", "")
+
         $cimSplat = @{
             OperationTimeoutSec = $OperationTimeoutSec
             CimSession = $CimSession
             Namespace = $namespace
             ClassName = "StdRegProv"
-            MethodName = "EnumValues"
+            MethodName = $methodName
             Arguments = @{
                 hDefKey = [uint32] ("0x{0:x}" -f $Hive)
                 sSubKeyName = $Key
+                sValueName = $Value
             }
 
         }
+
         $cimResult = Invoke-CimMethod @cimSplat
         if (!$Simple) {
             $cimResult
         } else {
-            $cimResult.sNames
+            if ($cimResult.psobject.Properties["sValue"]) {
+                $cimResult.sValue
+            } else {
+                $cimResult.uValue
+            }
         }
     }
 

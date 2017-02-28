@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-Execute a CIM method to get an expanded string value from the registry.
+Execute a CIM method to get a DWORD value from the registry.
 
 .DESCRIPTION
 Uses CIM to get a registry value for a subkey and name.
@@ -30,7 +30,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimMultiStringValue {
+function Get-CimRegDWORDValue {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -61,9 +61,9 @@ function Get-CimMultiStringValue {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            Invoke-CimGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            Invoke-CimRegGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
         } else {
-            Invoke-CimGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple   
+            Invoke-CimRegGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple   
         }
     }
 

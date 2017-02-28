@@ -30,7 +30,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimStringValue {
+function Get-CimRegStringValue {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -61,9 +61,9 @@ function Get-CimStringValue {
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            Invoke-CimGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            Invoke-CimRegGetValue -ComputerName $ComputerName -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
         } else {
-            Invoke-CimGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
+            Invoke-CimRegGetValue -CimSession $CimSession -Hive $Hive -Key $Key -Value $Value -OperationTimeoutSec $OperationTimeoutSec -Simple:$Simple
         }
     }
 

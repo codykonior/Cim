@@ -1,7 +1,7 @@
-# PowerShell: CimSession module
+# PowerShell: Cim module
 
 ## TOPIC
-    about_CimSession
+    about_Cim
 
 ## SHORT DESCRIPTION
     Allows CIM sessions to be opened to Windows Server 2003 and above with 
@@ -25,22 +25,22 @@
     Functions are split between three types:
     * Common functions you should use
         New-CimSessionDown
-        Get-CimKey
-        Get-CimValues
+        Get-CimRegKey
+        Get-CimRegValues
 
     * Less common functions you should only use if required
-        Get-CimEnumKey            
-        Get-CimEnumValues         
+        Get-CimRegEnumKey            
+        Get-CimRegEnumValues         
 
-        Get-CimBinaryValue        
-        Get-CimDWORDValue         
-        Get-CimExpandedStringValue
-        Get-CimMultiStringValue   
-        Get-CimQWORDValue         
-        Get-CimStringValue   
+        Get-CimRegBinaryValue        
+        Get-CimRegDWORDValue         
+        Get-CimRegExpandedStringValue
+        Get-CimRegMultiStringValue   
+        Get-CimRegQWORDValue         
+        Get-CimRegStringValue   
 
     * Internal functions you can't use
-        Invoke-CimGetValue
+        Invoke-CimRegGetValue
 
 	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.
@@ -60,6 +60,6 @@
     Get-CimValue C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 
 ## LINKS
-	https://github.com/codykonior/CimSession
+	https://github.com/codykonior/Cim
 
 
