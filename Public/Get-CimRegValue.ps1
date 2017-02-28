@@ -33,12 +33,12 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 function Get-CimRegValue {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
         [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [string] $Key,
