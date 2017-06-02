@@ -15,6 +15,7 @@ foreach ($fileName in (Get-ChildItem $PSScriptRoot "*.ps1" -Recurse)) {
             . $fileName.FullName
         } else {
             # Faster but no debugging
+            Invoke-Expression ([System.IO.File]::ReadAllText($fileName.FullName))
         }
     } catch {
 	    Write-Error $_
