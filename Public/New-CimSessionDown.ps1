@@ -46,6 +46,7 @@ function New-CimSessionDown {
         [ValidateNotNullorEmpty()]
         [string[]] $ComputerName = $env:COMPUTERNAME,
         [PSCredential] $Credential,
+        [switch] $Fresh,
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 	
@@ -68,19 +69,28 @@ function New-CimSessionDown {
 
     Process {
         foreach ($computer in $ComputerName) {
+			$cimSession = $null
+
             # Heaven help me, sometimes I found multiple connections already
-            if ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1) {
+            if (!$Fresh -and ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1)) {
                 Write-Verbose "Used existing connection to $computer using the $($cimSession.Protocol) protocol."
                 $cimSession
             } else {
                 try {
-                    if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: ([3-9]|[1-9][0-9]+)\.[0-9]+') {
-                        $cimSession = New-CimSession -ComputerName $computer @sessionSplat
-                        Write-Verbose "Connected to $computer using the WSMAN protocol."
-                        $cimSession
-                    }
+					if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: (.*)') {
+						$version = [version] $Matches[1]
+
+						# v3 can connect to v2 but it can't query CIM reliably over it
+						if ($version.Major -ge 3) {
+							$cimSession = New-CimSession -ComputerName $computer @sessionSplat
+							Write-Verbose "Connected to $computer using the WSMAN protocol."
+							$cimSession
+						} else {
+							Write-Verbose "Failed to connect to $computer with WSMAN protocol because the version is too low"
+						}
+					}
                 } catch {
-                    Write-Verbose "Faied to connect to $computer with WSMAN protocol: $_"
+                    Write-Verbose "Failed to connect to $computer with WSMAN protocol: $_"
                 }
 
                 if (!$cimSession) {
