@@ -69,7 +69,12 @@ function New-CimSessionDown {
 
     Process {
         foreach ($computer in $ComputerName) {
-			$cimSession = $null
+            try {
+                $computer = (Resolve-DnsName $computer)[0].Name
+            } catch {
+                Write-Verbose "Unable to resolve $computer FQDN"
+            }
+            $cimSession = $null
 
             # Heaven help me, sometimes I found multiple connections already
             if (!$Fresh -and ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1)) {
