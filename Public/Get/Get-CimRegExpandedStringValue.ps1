@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Execute a CIM method to get an expanded string value from the registry.
 
@@ -47,7 +47,7 @@ function Get-CimRegExpandedStringValue {
         [switch] $Simple,
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-	
+    
     begin {
     }
 

@@ -40,18 +40,18 @@
         Get-CimRegQWORDValue         
         Get-CimRegStringValue   
 
-	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
+    Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.
 
     Also, WSMAN has some limits for the maximum amount of content that can be
     sent per request. It's possible to hit this on very large registry queries.
 
 ## REQUIREMENTS
-	PowerShell v3 only the computer using the function, not on the host.
-	
+    PowerShell v3 only the computer using the function, not on the host.
+    
 ## EXAMPLE #1
-	$cimSession = New-CimSessionDown C1N1
-	Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
+    $cimSession = New-CimSessionDown C1N1
+    Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
 
 ## EXAMPLE #2
     Get the basic SQL Server keys.
@@ -65,6 +65,6 @@
     Get-CimRegKey -ComputerName C1N1 -Key "SOFTWARE\Microsoft\Microsoft SQL Server" | Get-CimRegKey -Value @("UpgradeIncompleteState", "ConfigurationState") | Get-CimRegValue | Format-Table
 
 ## LINKS
-	https://github.com/codykonior/Cim
+    https://github.com/codykonior/Cim
 
 

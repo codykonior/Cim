@@ -1,4 +1,4 @@
-﻿TOPIC
+TOPIC
     about_Cim
 
 SHORT DESCRIPTION
@@ -38,25 +38,25 @@ LONG DESCRIPTION
         Get-CimRegQWORDValue         
         Get-CimRegStringValue   
 
-	Remember, you should always specify -OperationTimeoutSec on any Get-Cim
+    Remember, you should always specify -OperationTimeoutSec on any Get-Cim
     cmdlet. However any functions in this module default this for you to 30.
 
 REQUIREMENTS
-	PowerShell v3 only the computer using the function, not on the host.
-	
+    PowerShell v3 only the computer using the function, not on the host.
+    
 EXAMPLE #1
-	$cimSession = New-CimSessionDown C1N1
-	Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
+    $cimSession = New-CimSessionDown C1N1
+    Get-CimInstance -CimSession $cimSession -Class Win32_Service -OperationTimeoutSec 30
 
 EXAMPLE #2
     Get-CimRegKey C1N1 "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
 
-	$cimSession = New-CimSessionDown C1N1
-	Get-CimRegEnumKey $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
-	Get-CimRegEnumValues $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+    $cimSession = New-CimSessionDown C1N1
+    Get-CimRegEnumKey $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
+    Get-CimRegEnumValues $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing"
     Get-CimRegStringValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "RepairCategory"
     Get-CimRegDWORDValue $cimSession "SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing" "EnableLog"
 
 LINKS
-	https://github.com/codykonior/Cim
+    https://github.com/codykonior/Cim
 

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Execute a CIM method to enumerate a list of keys from the registry.
 
@@ -46,7 +46,7 @@ function Get-CimRegKey {
 
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-	
+    
     begin {
     }
 

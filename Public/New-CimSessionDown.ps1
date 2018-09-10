@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Opens a CIM session to a computer, with a fallback from WSMAN to DCOM for older operating systems.
 
@@ -49,20 +49,20 @@ function New-CimSessionDown {
         [switch] $Fresh,
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-	
-	begin {
+    
+    begin {
         $dcomSessionOption = New-CimSessionOption -Protocol Dcom
 
         $verboseSplat = @{ 
-		    Verbose = $false
-	    }
-		
-		$sessionSplat = @{
-			Verbose = $false
-			OperationTimeoutSec = $OperationTimeoutSec
-		}
-		
-		if ($Credential) {
+            Verbose = $false
+        }
+        
+        $sessionSplat = @{
+            Verbose = $false
+            OperationTimeoutSec = $OperationTimeoutSec
+        }
+        
+        if ($Credential) {
             $sessionSplat.Credential = $Credential
         }
     }
@@ -82,18 +82,18 @@ function New-CimSessionDown {
                 $cimSession
             } else {
                 try {
-					if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: (.*)') {
-						$version = [version] $Matches[1]
+                    if ((Test-WSMan -ComputerName $computer @verboseSplat).productversion -match 'Stack: (.*)') {
+                        $version = [version] $Matches[1]
 
-						# v3 can connect to v2 but it can't query CIM reliably over it
-						if ($version.Major -ge 3) {
-							$cimSession = New-CimSession -ComputerName $computer @sessionSplat
-							Write-Verbose "Connected to $computer using the WSMAN protocol."
-							$cimSession
-						} else {
-							Write-Verbose "Failed to connect to $computer with WSMAN protocol because the version is too low"
-						}
-					}
+                        # v3 can connect to v2 but it can't query CIM reliably over it
+                        if ($version.Major -ge 3) {
+                            $cimSession = New-CimSession -ComputerName $computer @sessionSplat
+                            Write-Verbose "Connected to $computer using the WSMAN protocol."
+                            $cimSession
+                        } else {
+                            Write-Verbose "Failed to connect to $computer with WSMAN protocol because the version is too low"
+                        }
+                    }
                 } catch {
                     Write-Verbose "Failed to connect to $computer with WSMAN protocol: $_"
                 }
