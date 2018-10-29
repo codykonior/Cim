@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Execute a CIM method to enumerate a list of values from the registry.
+Execute a CIM method to enumerate a list of keys from the registry.
 
 .DESCRIPTION
-Uses CIM to enumerate values under a subkey.
+Uses CIM to enumerate keys under a subkey.
 
 .PARAMETER ComputerName
 A computer name. A New-CimSessionDown will be created for it.
@@ -27,29 +27,29 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimRegEnumValues {
+function Get-CimRegEnumKey {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
-        [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "ComputerName")]
+        [string] $ComputerName,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string] $Key,
 
         [switch] $Simple,
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
     }
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $CimSession = New-CimSessionDown $ComputerName        
+            $CimSession = New-CimSessionDown $ComputerName
         }
         if ($CimSession.Protocol -eq "WSMAN") {
             $namespace = "root\cimv2"
@@ -59,16 +59,17 @@ function Get-CimRegEnumValues {
 
         $cimSplat = @{
             OperationTimeoutSec = $OperationTimeoutSec
-            CimSession = $CimSession
-            Namespace = $namespace
-            ClassName = "StdRegProv"
-            MethodName = "EnumValues"
-            Arguments = @{
-                hDefKey = [uint32] ("0x{0:x}" -f $Hive)
+            CimSession          = $CimSession
+            Namespace           = $namespace
+            ClassName           = "StdRegProv"
+            MethodName          = "EnumKey"
+            Arguments           = @{
+                hDefKey     = [uint32] ("0x{0:x}" -f $Hive)
                 sSubKeyName = $Key
             }
 
         }
+
         $cimResult = Invoke-CimMethod @cimSplat
         if (!$Simple) {
             $cimResult

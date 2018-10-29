@@ -33,25 +33,25 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 function Get-CimRegValue {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string] $Key,
         [string[]] $Value,
 
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
     }
 
     process {
-        $cimValues = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegEnumValues -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
+        $cimValues = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegEnumValue -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
 
         for ($i = 0; $cimValues.sNames -and $i -lt $cimValues.sNames.Count; $i++) {
             $cimValue = $cimValues.sNames[$i]
@@ -91,12 +91,12 @@ function Get-CimRegValue {
 
                 [PSCustomObject] @{
                     ComputerName = $cimValues.PSComputerName
-                    Hive = $Hive
-                    Key = $Key
-                    Value = $cimValue
-                    Data = $cimData
-                    Type = $cimType
-                 }
+                    Hive         = $Hive
+                    Key          = $Key
+                    Value        = $cimValue
+                    Data         = $cimData
+                    Type         = $cimType
+                }
             }
         }
     }

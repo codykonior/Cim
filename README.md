@@ -31,7 +31,7 @@
 
     * Less common functions you should only use if required
         Get-CimRegEnumKey            
-        Get-CimRegEnumValues         
+        Get-CimRegEnumValue         
 
         Get-CimRegBinaryValue        
         Get-CimRegDWORDValue         

@@ -12,7 +12,7 @@
 RootModule = 'Cim.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.4.1'
+ModuleVersion = '1.5.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -75,7 +75,7 @@ FunctionsToExport = @(
     'Get-CimRegValue',
 
     'Get-CimRegEnumKey',
-    'Get-CimRegEnumValues',
+    'Get-CimRegEnumValue',
     'Get-CimRegBinaryValue',
     'Get-CimRegDWORDValue',
     'Get-CimRegExpandedStringValue',

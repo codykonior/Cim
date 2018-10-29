@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Execute a CIM method to get a binary value from the registry.
+Execute a CIM method to get a QWORD value from the registry.
 
 .DESCRIPTION
 Uses CIM to get a registry value for a subkey and name.
@@ -30,30 +30,30 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimRegBinaryValue {
+function Get-CimRegQWORDValue {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string] $Key,
         [string] $Value,
 
         [switch] $Simple,
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
     }
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $CimSession = New-CimSessionDown $ComputerName        
+            $CimSession = New-CimSessionDown $ComputerName
         }
         if ($CimSession.Protocol -eq "WSMAN") {
             $namespace = "root\cimv2"
@@ -63,14 +63,14 @@ function Get-CimRegBinaryValue {
 
         $cimSplat = @{
             OperationTimeoutSec = $OperationTimeoutSec
-            CimSession = $CimSession
-            Namespace = $namespace
-            ClassName = "StdRegProv"
-            MethodName = $PSCmdlet.MyInvocation.MyCommand.Name.Replace("-CimReg", "")
-            Arguments = @{
-                hDefKey = [uint32] ("0x{0:x}" -f $Hive)
+            CimSession          = $CimSession
+            Namespace           = $namespace
+            ClassName           = "StdRegProv"
+            MethodName          = $PSCmdlet.MyInvocation.MyCommand.Name.Replace("-CimReg", "")
+            Arguments           = @{
+                hDefKey     = [uint32] ("0x{0:x}" -f $Hive)
                 sSubKeyName = $Key
-                sValueName = $Value
+                sValueName  = $Value
             }
 
         }

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Execute a CIM method to get a QWORD value from the registry.
+Execute a CIM method to get a binary value from the registry.
 
 .DESCRIPTION
 Uses CIM to get a registry value for a subkey and name.
@@ -30,7 +30,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 #>
 
-function Get-CimRegQWORDValue {
+function Get-CimRegBinaryValue {
     [CmdletBinding()]
     param(
         [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
@@ -47,13 +47,13 @@ function Get-CimRegQWORDValue {
         [switch] $Simple,
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
     }
 
     process {
         if ($PSCmdlet.ParameterSetName -eq "ComputerName") {
-            $CimSession = New-CimSessionDown $ComputerName        
+            $CimSession = New-CimSessionDown $ComputerName
         }
         if ($CimSession.Protocol -eq "WSMAN") {
             $namespace = "root\cimv2"

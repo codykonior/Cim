@@ -30,7 +30,7 @@ String
 Microsoft.Management.Infrastructure.CimSession
 
 .NOTES
-The "Down" in New-CimSessionDown stands for "down-level", because it talks to down-level versions of Windows. 
+The "Down" in New-CimSessionDown stands for "down-level", because it talks to down-level versions of Windows.
 
 Verbose is always explicitly disabled on the New-CimSession call because it returns a useless message of ''.
 
@@ -41,7 +41,7 @@ This function is based largely on work done by Mike F Robbins @ http://mikefrobb
 function New-CimSessionDown {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias("Name")]
         [ValidateNotNullorEmpty()]
         [string[]] $ComputerName = $env:COMPUTERNAME,
@@ -49,19 +49,19 @@ function New-CimSessionDown {
         [switch] $Fresh,
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
         $dcomSessionOption = New-CimSessionOption -Protocol Dcom
 
-        $verboseSplat = @{ 
+        $verboseSplat = @{
             Verbose = $false
         }
-        
+
         $sessionSplat = @{
-            Verbose = $false
+            Verbose             = $false
             OperationTimeoutSec = $OperationTimeoutSec
         }
-        
+
         if ($Credential) {
             $sessionSplat.Credential = $Credential
         }

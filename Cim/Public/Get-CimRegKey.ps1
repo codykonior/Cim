@@ -33,20 +33,20 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 function Get-CimRegKey {
     [CmdletBinding()]
     param(
-        [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
+        [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "CimSession")]
         [Microsoft.Management.Infrastructure.CimSession] $CimSession,
 
-        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Microsoft.Win32.RegistryHive] $Hive = "LocalMachine",
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [string] $Key,
         [string[]] $Value,
 
         [int] $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
-    
+
     begin {
     }
 
@@ -57,8 +57,8 @@ function Get-CimRegKey {
             if (!$Value -or $Value -contains $cimName) {
                 [PSCustomObject] @{
                     ComputerName = $cimKeys.PSComputerName
-                    Hive = $Hive
-                    Key = "$Key\$cimName"
+                    Hive         = $Hive
+                    Key          = "$Key\$cimName"
                 }
             }
         }
