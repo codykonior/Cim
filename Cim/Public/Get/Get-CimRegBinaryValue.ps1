@@ -32,7 +32,7 @@ Defaults to 30. If this wasn't specified operations may never timeout.
 
 function Get-CimRegBinaryValue {
     [CmdletBinding()]
-    param(
+    param (
         [Parameter(ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="ComputerName")]
         [string] $ComputerName = $env:COMPUTERNAME,
         [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true, ParameterSetName="CimSession")]

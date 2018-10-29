@@ -40,7 +40,7 @@ This function is based largely on work done by Mike F Robbins @ http://mikefrobb
 
 function New-CimSessionDown {
     [CmdletBinding()]
-    param(
+    param (
         [Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Alias("Name")]
         [ValidateNotNullorEmpty()]
