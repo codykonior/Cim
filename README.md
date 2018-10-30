@@ -1,4 +1,6 @@
-# ![Cim logo][1]
+# Cim PowerShell Module by Cody Konior
+
+![Cim logo][1]
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1e2t9v0rfhuy5awk?svg=true)](https://ci.appveyor.com/project/codykonior/cim)
 
