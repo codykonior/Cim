@@ -20,9 +20,8 @@ be run over a PSSession and cause a shell to be provisioned and torn down each t
 but now the Cim module lets you do this all remotely over the CimSession. It also supports easy chaining to get the data you
 want.
 
-## Demo
-
-![Demo of differences between existing CIM and the new CIM commands][2]
+## Installation
+- `Install-Module Cim`
 
 ## Major functions
 - `New-CimSessionDown` anywhere you would previously use `New-CimSession`
@@ -33,6 +32,10 @@ want.
 - Every CIM operation should include an -OperationTimeoutSec. It defaults to 30.
 - `Get-CimRegKey` and `Get-CimRegValue` can be chained together to an arbitrary
   length without specifying additional CimSession parameters.
+
+## Demo
+
+![Demo of differences between existing CIM and the new CIM commands][2]
 
 [1]: Images/cim.ai.svg
 [2]: Images/cim.gif
