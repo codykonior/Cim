@@ -17,6 +17,9 @@ Specifies a user account that has permission to perform this action. The default
 
 It's not possible to tell connections apart by credential, so, multiple connections to one server with different users is not recommended, as the wrong session may be returned.
 
+.PARAMETER ForceResolve
+Forces sessions created to the local computer name to resolve and use the FQDN instead of localhost.
+
 .EXAMPLE
 New-CimSessionDown -ComputerName Server1
 New-CimSessionDown -ComputerName Server1, Server2
@@ -47,6 +50,7 @@ function New-CimSessionDown {
         [string[]] $ComputerName = $env:COMPUTERNAME,
         [PSCredential] $Credential,
         [switch] $Fresh,
+        [switch] $ForceResolve,
         $OperationTimeoutSec = 30 # "Robust connection timeout minimum is 180" but that's too long
     )
 
@@ -70,7 +74,11 @@ function New-CimSessionDown {
     Process {
         foreach ($computer in $ComputerName) {
             try {
-                $computer = (Resolve-DnsName $computer)[0].Name
+                if (!$ForceResolve -and $computer -eq $env:COMPUTERNAME) {
+                    $computer = "localhost"
+                } else {
+                    $computer = (Resolve-DnsName $computer)[0].Name
+                }
             } catch {
                 Write-Verbose "Unable to resolve $computer FQDN"
             }
