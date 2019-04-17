@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   On the downside, the PSComputerName returned with each query is then localhost
   instead of the name or FQDN.
   So this behaviour can be overridden with -ForceResolve.
+- Improve module load time.
+
+### Fixed
+
+- Changelog syntax passes VS Code markdown linter.
 
 ## [1.5.1] - 2018-10-30
 
