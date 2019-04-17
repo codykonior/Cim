@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 if ($Debugging) {
-    foreach ($fileName in (Get-ChildItem $PSScriptRoot "*-*.ps1" -Recurse -Exclude "*.Steps.ps1", "*.Tests.ps1", "*.ps1xml" )) {
+    foreach ($fileName in (Get-ChildItem $PSScriptRoot "*-*.ps1" -Recurse -Exclude "*.Steps.ps1", "*.Tests.ps1", "*.ps1xml")) {
         try {
             Write-Verbose "Loading function from path '$fileName'."
             . $fileName.FullName
