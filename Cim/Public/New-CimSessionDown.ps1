@@ -74,10 +74,16 @@ function New-CimSessionDown {
     Process {
         foreach ($computer in $ComputerName) {
             try {
-                if (!$ForceResolve -and $computer -eq $env:COMPUTERNAME) {
+                if (-not $ForceResolve -and $computer -eq $env:COMPUTERNAME) {
                     $computer = "localhost"
                 } else {
-                    $computer = (Resolve-DnsName $computer)[0].Name
+                    $resolvedName = (Resolve-DnsName $computer)[0]
+
+                    $computer = if ($resolvedName.psobject.Properties["NameHost"]) {
+                        $resolvedName.NameHost
+                    } else {
+                        $resolvedName.Name
+                    }
                 }
             } catch {
                 Write-Verbose "Unable to resolve $computer FQDN"
@@ -85,7 +91,7 @@ function New-CimSessionDown {
             $cimSession = $null
 
             # Heaven help me, sometimes I found multiple connections already
-            if (!$Fresh -and ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1)) {
+            if (-not $Fresh -and ($cimSession = Get-CimSession | Where-Object { $_.ComputerName -eq $computer } | Select-Object -First 1)) {
                 Write-Verbose "Used existing connection to $computer using the $($cimSession.Protocol) protocol."
                 $cimSession
             } else {
@@ -106,7 +112,7 @@ function New-CimSessionDown {
                     Write-Verbose "Failed to connect to $computer with WSMAN protocol: $_"
                 }
 
-                if (!$cimSession) {
+                if (-not $cimSession) {
                     try {
                         New-CimSession -ComputerName $computer @sessionSplat -SessionOption $dcomSessionOption
                         Write-Verbose "Connected to $computer using the DCOM protocol."

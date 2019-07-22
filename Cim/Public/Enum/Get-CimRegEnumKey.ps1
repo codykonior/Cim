@@ -71,7 +71,7 @@ function Get-CimRegEnumKey {
         }
 
         $cimResult = Invoke-CimMethod @cimSplat
-        if (!$Simple) {
+        if (-not $Simple) {
             $cimResult
         } else {
             $cimResult.sNames

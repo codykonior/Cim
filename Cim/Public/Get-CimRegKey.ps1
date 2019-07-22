@@ -54,7 +54,7 @@ function Get-CimRegKey {
         $cimKeys = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegEnumKey -Hive $Hive -Key $Key -OperationTimeoutSec $OperationTimeoutSec
 
         foreach ($cimName in $cimKeys.sNames) {
-            if (!$Value -or $Value -contains $cimName) {
+            if (-not $Value -or $Value -contains $cimName) {
                 [PSCustomObject] @{
                     ComputerName = $cimKeys.PSComputerName
                     Hive         = $Hive

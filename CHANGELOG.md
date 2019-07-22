@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None.
 
+## [1.6.3] - 2019-07-22
+
+### Fixed
+
+- Improve computer name selection logic so it's more reliable picking up a FQDN.
+
 ## [1.6.2] - 2019-06-18
 
 ### Fixed

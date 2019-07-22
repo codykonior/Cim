@@ -55,7 +55,7 @@ function Get-CimRegValue {
 
         for ($i = 0; $cimValues.sNames -and $i -lt $cimValues.sNames.Count; $i++) {
             $cimValue = $cimValues.sNames[$i]
-            if (!$Value -or $Value -contains $cimValue) {
+            if (-not $Value -or $Value -contains $cimValue) {
                 switch ($cimType = [Microsoft.Win32.RegistryValueKind] $cimValues.Types[$i]) {
                     "String" {
                         $cimData = @(if ($PSCmdlet.ParameterSetName -eq "ComputerName") { $ComputerName } else { $CimSession }) | Get-CimRegStringValue -Hive $Hive -Key $Key -Value $cimValue -Simple -OperationTimeoutSec $OperationTimeoutSec

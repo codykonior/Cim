@@ -76,7 +76,7 @@ function Get-CimRegExpandedStringValue {
         }
 
         $cimResult = Invoke-CimMethod @cimSplat
-        if (!$Simple) {
+        if (-not $Simple) {
             $cimResult
         } else {
             if ($cimResult.psobject.Properties["sValue"]) {
